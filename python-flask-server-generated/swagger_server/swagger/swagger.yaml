@@ -1,0 +1,311 @@
+openapi: 3.0.0
+info:
+  title: Internet Store API
+  description: API для интернет-магазина
+  version: 1.0.0
+servers:
+- url: https://api.myshop.com/v1
+  description: Основной API сервер
+paths:
+  /products:
+    get:
+      tags:
+      - Products
+      summary: Получение списка товаров
+      operationId: products_get
+      responses:
+        "200":
+          description: Список товаров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    post:
+      tags:
+      - Products
+      summary: Добавление нового товара
+      operationId: products_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+        required: true
+      responses:
+        "201":
+          description: Товар создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+  /products/{productId}:
+    get:
+      tags:
+      - Products
+      summary: Получение информации о товаре
+      operationId: products_product_id_get
+      parameters:
+      - name: productId
+        in: path
+        description: Идентификатор товара
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Информация о товаре
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Товар не найден
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    put:
+      tags:
+      - Products
+      summary: Обновление товара
+      operationId: products_product_id_put
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+        required: true
+      responses:
+        "200":
+          description: Товар обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+    delete:
+      tags:
+      - Products
+      summary: Удаление товара
+      operationId: products_product_id_delete
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Товар удален
+      x-openapi-router-controller: swagger_server.controllers.products_controller
+  /users/register:
+    post:
+      tags:
+      - Users
+      summary: Регистрация нового пользователя
+      operationId: users_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        "201":
+          description: Пользователь зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                add new user:
+                  value: mvksnjdcsd
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /users/login:
+    post:
+      tags:
+      - Users
+      summary: Логин пользователя
+      operationId: users_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        "200":
+          description: Успешный логин
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+      x-openapi-router-controller: swagger_server.controllers.users_controller
+  /orders:
+    get:
+      tags:
+      - Orders
+      summary: Получение списка заказов пользователя
+      operationId: orders_get
+      responses:
+        "200":
+          description: Список заказов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.orders_controller
+    post:
+      tags:
+      - Orders
+      summary: Создание нового заказа
+      operationId: orders_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+        required: true
+      responses:
+        "201":
+          description: Заказ создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+      x-openapi-router-controller: swagger_server.controllers.orders_controller
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+      example:
+        price: 0.80082819046101150206595775671303272247314453125
+        name: name
+        description: description
+        id: id
+        stock: 6
+    ProductInput:
+      required:
+      - name
+      - price
+      - stock
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+      example:
+        id: id
+        email: email
+        username: username
+    UserRegistration:
+      required:
+      - email
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+    UserLogin:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        totalPrice:
+          type: number
+      example:
+        totalPrice: 0.80082819046101150206595775671303272247314453125
+        id: id
+        userId: userId
+        products:
+        - price: 0.80082819046101150206595775671303272247314453125
+          name: name
+          description: description
+          id: id
+          stock: 6
+        - price: 0.80082819046101150206595775671303272247314453125
+          name: name
+          description: description
+          id: id
+          stock: 6
+    OrderInput:
+      required:
+      - products
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductInput'
+    inline_response_200:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT токен
+      example:
+        token: token
+
